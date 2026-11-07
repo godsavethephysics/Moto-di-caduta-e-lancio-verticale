@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f4f7fc">
+  <title>Caduta libera e lancio verticale | GodSaveThePhysics</title>
+  <style>
+    :root{--ink:#172741;--muted:#5f7087;--line:#dce5f0;--blue:#2365dc;--blue-deep:#174eae;--aqua:#0f947e;--bg:#f4f7fc;--panel:#fff;--orange:#eb8e38;--red:#d54e52;--radius:18px;--shadow:0 9px 28px rgba(29,54,95,.06)}
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:var(--bg);color:var(--ink);font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;font-size:15px;line-height:1.45}
+    button,input,select{font:inherit}
+    button{cursor:pointer}
+    button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #71a4f7;outline-offset:3px}
+    .shell{max-width:1390px;margin:0 auto;padding:25px 23px 45px}
+    .header{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;margin-bottom:19px}
+    .eyebrow{color:#2164bc;font-weight:800;font-size:11px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:5px}
+    h1{font-size:clamp(25px,2.4vw,35px);line-height:1.15;letter-spacing:-.045em;margin:0 0 8px;font-weight:800}
+    .subtitle{color:var(--muted);margin:0;font-size:14px;max-width:810px}
+    .header-chips{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end;max-width:320px}
+    .chip{display:inline-flex;align-items:center;gap:5px;white-space:nowrap;background:#e9f1fd;border:1px solid #d9e6f7;border-radius:999px;font-size:12px;color:#355781;padding:7px 10px;font-weight:700}
+    .chip.accent{background:#e4f6f2;border-color:#c7e9df;color:#087966}
+    .panel{border-radius:var(--radius);border:1px solid var(--line);box-shadow:var(--shadow);background:var(--panel)}
+    .modes{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:15px}
+    .mode{border:1px solid #cfdceb;background:#fff;color:#425776;border-radius:11px;padding:11px 17px;font-weight:750;transition:.16s;min-height:44px}
+    .mode:hover{border-color:#8ab1f2}
+    .mode.active{background:#225fca;color:#fff;border-color:#225fca;box-shadow:0 4px 12px rgba(34,95,202,.16)}
+    .controls{padding:17px 19px 15px;margin-bottom:15px}
+    .panel-heading{display:flex;justify-content:space-between;align-items:center;gap:9px;margin-bottom:12px;flex-wrap:wrap}
+    .panel-heading strong{font-size:15px;letter-spacing:-.013em}
+    .helper{font-size:12px;color:#728198}
+    .parameter-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,.95fr);gap:20px}
+    .param-name{display:flex;justify-content:space-between;align-items:center;gap:9px;color:#354963;font-size:13px;font-weight:700;margin-bottom:11px}
+    .number-wrap{display:flex;align-items:center;border:1px solid #d6e1ee;border-radius:9px;padding:0 9px;background:#fbfdff;flex-shrink:0}
+    .number-wrap input{height:32px;width:64px;text-align:right;font-variant-numeric:tabular-nums;font-weight:800;border:0;background:transparent;color:#1c3c72;padding:0;outline:none}
+    .number-wrap .unit{font-size:12px;color:#6b809e;margin-left:4px}
+    input[type=range]{appearance:none;-webkit-appearance:none;display:block;width:100%;height:7px;border-radius:99px;background:linear-gradient(to right,#3172e2 0%,#3172e2 var(--pct,35%),#e4ebf4 var(--pct,35%),#e4ebf4 100%);margin:16px 0 8px;touch-action:pan-y}
+    input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;width:19px;height:19px;border-radius:50%;background:#fff;border:5px solid #286bd7;box-shadow:0 1px 6px #45618d32}
+    input[type=range]::-moz-range-thumb{width:10px;height:10px;border-radius:50%;background:#fff;border:5px solid #286bd7;box-shadow:0 1px 6px #45618d32}
+    .minmax{display:flex;justify-content:space-between;color:#8b98aa;font-size:11px}
+    .gravity-presets{display:flex;gap:5px;flex-wrap:wrap;margin-top:7px}
+    .gravity-btn{border:1px solid #dce5f0;color:#51627c;background:#f9fbfe;border-radius:8px;padding:5px 10px;font-size:12px;font-weight:750}
+    .gravity-btn.selected{border-color:#5791df;background:#e9f3ff;color:#1854ae}
+    .playback{display:flex;align-items:center;gap:12px;flex-wrap:wrap;border-top:1px solid #edf1f7;margin-top:17px;padding-top:16px}
+    .play{border:none;background:#2165d1;color:#fff;min-height:42px;padding:0 21px;border-radius:11px;font-weight:800;min-width:132px}
+    .play:hover{background:#164fac}
+    .secondary{min-height:41px;background:#fff;border:1px solid #d3dfec;border-radius:10px;padding:0 13px;color:#475f7d;font-weight:700}
+    .secondary:hover{background:#f2f7ff}
+    .speed-control{display:flex;align-items:center;gap:6px;margin-left:auto;color:#78879a;font-size:12px;font-weight:700;flex-wrap:wrap}
+    .speed{border:1px solid #d9e4f2;border-radius:8px;color:#537093;font-size:12px;font-weight:800;padding:6px 9px;background:#f8faff;min-height:32px}
+    .speed.active{background:#e1edff;color:#195ab8;border-color:#83b1ef}
+    .time-slider{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center;margin-top:15px}
+    .time-slider label{font-weight:750;color:#596b84;font-size:12px;white-space:nowrap}
+    .time-slider input{margin:8px 0 9px}
+    .time-slider output{min-width:93px;text-align:right;color:#244e8a;font-weight:800;font-variant-numeric:tabular-nums;font-size:13px}
+    .workspace{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:15px}
+    .stage-panel{overflow:hidden;min-width:0}
+    .title-bar{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:14px 17px 11px;align-items:center;border-bottom:1px solid #edf1f6}
+    .title-bar strong{font-size:14px}
+    .small-pill{font-size:11px;font-weight:750;color:#687b93;background:#f0f4fa;padding:5px 9px;border-radius:99px}
+    .stage-canvas{width:100%;height:410px;display:block}
+    .stage-footer{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid #e9eef6;background:#fbfdff}
+    .readout{padding:14px 12px 12px;text-align:center;min-width:0}
+    .readout+.readout{border-left:1px solid #e6edf7}
+    .readout .k{color:#70849b;font-size:11px;font-weight:750;margin-bottom:4px}
+    .readout .v{font-size:clamp(17px,1.75vw,24px);font-weight:850;font-variant-numeric:tabular-nums;letter-spacing:-.035em;white-space:nowrap}
+    .readout .v.blue{color:#2365d2}.readout .v.red{color:#cd5252}.readout .v.green{color:#168d7d}
+    .chart-stack{display:grid;grid-template-rows:1fr 1fr;gap:15px;min-width:0}
+    .graph-panel{min-width:0;overflow:hidden}
+    .graph-title{display:flex;align-items:center;justify-content:space-between;gap:5px;padding:12px 16px 0}
+    .graph-title strong{font-size:13px}
+    .graph-title span{font-size:11px;color:#71839b}
+    .graph-canvas{width:100%;height:232px;display:block}
+    .summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px;margin:16px 0}
+    .stat{padding:16px 15px;min-width:0}
+    .stat-label{color:#61748e;font-size:12px;font-weight:700;min-height:35px}
+    .stat-value{font-size:clamp(18px,2vw,28px);font-weight:850;letter-spacing:-.035em;color:#1d4f9e;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+    .stat-sub{color:#8392a5;font-size:11px;margin-top:2px}
+    .formulas{padding:19px 20px}
+    .equations{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin:13px 0}
+    .eq{background:#f5f8fd;border:1px solid #e2eaf5;border-radius:12px;padding:13px 17px;min-width:0}
+    .eq-title{font-size:11px;color:#7487a0;font-weight:750;margin-bottom:5px}
+    .math{font-family:Cambria,Georgia,"Times New Roman",serif;font-size:clamp(16px,2vw,20px);font-style:italic;color:#1d4682;overflow-wrap:anywhere;line-height:1.6}
+    .math .roman{font-style:normal}
+    .bottom-note{font-size:13px;color:#62738c;margin:10px 0 0;line-height:1.6}
+    .status-note{font-size:12px;font-weight:700;color:#147e6f;margin-top:8px}
+    .workings{margin-top:16px;padding:19px 20px}
+    .workings-intro{color:#64768c;font-size:13px;margin:0 0 15px;line-height:1.6}
+    .working-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+    .working-card{min-width:0;border:1px solid #e1e9f4;background:#fafcff;border-radius:13px;padding:15px 16px}
+    .working-title{font-size:13px;font-weight:800;color:#244c82;margin-bottom:11px}
+    .calc-step{font-family:Cambria,Georgia,"Times New Roman",serif;font-size:16px;line-height:1.65;color:#2b4362;overflow-wrap:anywhere;word-break:normal;margin:7px 0}
+    .calc-step.formula{color:#1c5caa;font-weight:700}
+    .calc-step.conclusion{color:#117a69;font-weight:700;border-top:1px solid #e4ecf6;margin-top:10px;padding-top:9px}
+    .calc-note{font-size:12px;color:#6d7e94;line-height:1.55;margin:10px 0 0}
+    .calc-step sup{font-size:.7em}.calc-step sub{font-size:.72em}
+    .calc-step .unit-cancel{color:#687e97}
+    @media(max-width:720px){.working-grid{grid-template-columns:1fr}.workings{padding:16px 13px}.working-card{padding:13px}.calc-step{font-size:15px}}
+    .footnote{font-size:12px;color:#8191a6;padding:14px 4px;text-align:center}
+    [hidden]{display:none!important}
+    @media(max-width:970px){.workspace{grid-template-columns:1fr}.chart-stack{grid-template-columns:1fr 1fr;grid-template-rows:auto}.stage-canvas{height:390px}.graph-canvas{height:230px}.header-chips{max-width:200px}}
+    @media(max-width:720px){.shell{padding:17px 12px 26px}.header{display:block}.header-chips{justify-content:flex-start;max-width:none;margin-top:12px}.controls{padding:14px}.parameter-grid{grid-template-columns:1fr 1fr;gap:18px}.parameter-grid .g-control{grid-column:1/-1}.stage-canvas{height:360px}.summary{grid-template-columns:1fr 1fr;gap:9px}.equations{grid-template-columns:1fr}.chart-stack{grid-template-columns:1fr}.graph-canvas{height:220px}.playback{gap:7px}.speed-control{margin-left:0;width:100%}.stat-label{min-height:auto}.stat{padding:13px}.mode{flex:1;padding:11px 9px}.time-slider{gap:7px}}
+    @media(max-width:420px){.shell{padding:13px 9px 25px}.parameter-grid{grid-template-columns:1fr}.parameter-grid .g-control{grid-column:auto}.play{min-width:113px}.stage-canvas{height:325px}.graph-canvas{height:205px}.readout{padding:10px 3px}.readout .k{font-size:10px}.readout .v{font-size:17px}.title-bar{padding:12px}.summary{gap:8px}.chip{font-size:10px}.mode{font-size:13px}.time-slider label{font-size:11px}.time-slider output{min-width:80px}}
+    @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+  </style>
+</head>
+<body>
+<main class="shell">
+  <header class="header">
+    <div>
+      <div class="eyebrow">GodSaveThePhysics · Laboratorio interattivo</div>
+      <h1>Caduta libera e lancio verticale</h1>
+      <p class="subtitle">Modifica le condizioni iniziali, segui il corpo in movimento e osserva come cambiano posizione, velocità e tempo di volo.</p>
+    </div>
+    <div class="header-chips"><span class="chip">↑ Asse <em>y</em> positivo</span><span class="chip accent">Accelerazione: −g</span></div>
+  </header>
+
+  <div class="modes" role="group" aria-label="Tipo di moto">
+    <button class="mode active" type="button" data-mode="fall" aria-pressed="true">🍎 Caduta libera della mela</button>
+    <button class="mode" type="button" data-mode="throw" aria-pressed="false">↑ Lancio verticale verso l’alto</button>
+  </div>
+
+  <section class="panel controls" aria-label="Parametri e riproduzione">
+    <div class="panel-heading"><strong>Condizioni iniziali</strong><span class="helper">Modificabili anche durante la simulazione</span></div>
+    <div class="parameter-grid">
+      <div class="param">
+        <div class="param-name"><label for="hRange">Altezza iniziale <em>y₀</em></label><div class="number-wrap"><input id="hNum" aria-label="Altezza iniziale in metri" type="number" min="0" max="100" step="0.5" value="35"><span class="unit">m</span></div></div>
+        <input id="hRange" aria-label="Altezza iniziale" type="range" min="0" max="100" step="0.5" value="35">
+        <div class="minmax"><span>0 m</span><span>100 m</span></div>
+      </div>
+      <div class="param" id="velocityControl" hidden>
+        <div class="param-name"><label for="vRange">Velocità iniziale <em>v₀</em></label><div class="number-wrap"><input id="vNum" aria-label="Velocità iniziale in metri al secondo" type="number" min="1" max="30" step="0.5" value="16"><span class="unit">m/s</span></div></div>
+        <input id="vRange" aria-label="Velocità iniziale" type="range" min="1" max="30" step="0.5" value="16">
+        <div class="minmax"><span>1 m/s</span><span>30 m/s</span></div>
+      </div>
+      <div class="param g-control">
+        <div class="param-name"><label for="gRange">Gravità <em>g</em></label><div class="number-wrap"><input id="gNum" aria-label="Accelerazione di gravità" type="number" min="0.5" max="20" step="0.01" value="9.81"><span class="unit">m/s²</span></div></div>
+        <input id="gRange" aria-label="Gravità" type="range" min="0.5" max="20" step="0.01" value="9.81">
+        <div class="gravity-presets" role="group" aria-label="Gravità dei corpi celesti"><button class="gravity-btn selected" type="button" data-g="9.81">Terra</button><button class="gravity-btn" type="button" data-g="1.62">Luna</button><button class="gravity-btn" type="button" data-g="3.71">Marte</button></div>
+      </div>
+    </div>
+    <div class="playback">
+      <button id="playBtn" type="button" class="play">▶ Avvia</button>
+      <button id="resetBtn" type="button" class="secondary">↺ Ricomincia</button>
+      <button id="stepBtn" type="button" class="secondary" title="Avanza di un decimo di secondo">+ 0,1 s</button>
+      <div class="speed-control" role="group" aria-label="Velocità di riproduzione"><span>Riproduzione:</span><button class="speed" type="button" data-speed="0.5">0,5×</button><button class="speed active" type="button" data-speed="1">1×</button><button class="speed" type="button" data-speed="2">2×</button><button class="speed" type="button" data-speed="4">4×</button></div>
+    </div>
+    <div class="time-slider"><label for="timeRange">Scorri il tempo</label><input id="timeRange" type="range" min="0" max="1" step="0.001" value="0" aria-label="Tempo della simulazione"><output id="timeValue" for="timeRange">0,00 s</output></div>
+  </section>
+
+  <section class="workspace" aria-label="Animazione e grafici">
+    <div class="panel stage-panel">
+      <div class="title-bar"><strong id="stageTitle">🍎 Caduta della mela</strong><span class="small-pill" id="phaseLabel">Pronta a cadere</span></div>
+      <canvas class="stage-canvas" id="stage" role="img" aria-label="Simulazione animata della quota del corpo"></canvas>
+      <div class="stage-footer">
+        <div class="readout"><div class="k">Tempo <em>t</em></div><div class="v blue" id="liveTime">0,00 s</div></div>
+        <div class="readout"><div class="k">Quota <em>y(t)</em></div><div class="v green" id="liveHeight">35,00 m</div></div>
+        <div class="readout"><div class="k">Velocità <em>v(t)</em></div><div class="v red" id="liveVelocity">0,00 m/s</div></div>
+      </div>
+    </div>
+    <div class="chart-stack">
+      <div class="panel graph-panel"><div class="graph-title"><strong>Posizione · <em>y(t)</em></strong><span>Quota rispetto al suolo (m)</span></div><canvas class="graph-canvas" id="positionGraph" role="img" aria-label="Grafico quota-tempo"></canvas></div>
+      <div class="panel graph-panel"><div class="graph-title"><strong>Velocità · <em>v(t)</em></strong><span>Segno positivo verso l’alto (m/s)</span></div><canvas class="graph-canvas" id="velocityGraph" role="img" aria-label="Grafico velocità-tempo"></canvas></div>
+    </div>
+  </section>
+
+  <section class="summary" aria-label="Risultati calcolati">
+    <div class="panel stat"><div class="stat-label">Tempo totale di volo <em>T</em></div><div class="stat-value" id="flightTime">2,67 s</div><div class="stat-sub">Dal rilascio all’impatto</div></div>
+    <div class="panel stat"><div class="stat-label">Velocità finale <em>v<sub>f</sub></em></div><div class="stat-value" id="finalVelocity">−26,20 m/s</div><div class="stat-sub">Negativa: verso il basso</div></div>
+    <div class="panel stat"><div class="stat-label">Altezza massima <em>y<sub>max</sub></em></div><div class="stat-value" id="maximumHeight">35,00 m</div><div class="stat-sub">Misurata rispetto al suolo</div></div>
+    <div class="panel stat"><div class="stat-label" id="fourthStatTitle">Spazio percorso totale</div><div class="stat-value" id="fourthStat">35,00 m</div><div class="stat-sub" id="fourthStatSub">Percorso della mela</div></div>
+  </section>
+
+  <section class="panel formulas" aria-label="Formule e osservazioni">
+    <div class="panel-heading"><strong>Le equazioni del moto</strong><span class="helper">Modello ideale: nessuna resistenza dell’aria</span></div>
+    <div class="equations">
+      <div class="eq"><div class="eq-title">Legge oraria</div><div class="math"><em>y(t)</em> = <span id="equationY">35 − 4,905 t²</span></div></div>
+      <div class="eq"><div class="eq-title">Velocità istantanea</div><div class="math"><em>v(t)</em> = <span id="equationV">− 9,81 t</span></div></div>
+    </div>
+    <p class="bottom-note" id="explanation">La mela parte da ferma. La velocità diventa progressivamente più negativa, mentre l’accelerazione resta costante e diretta verso il basso.</p>
+    <div class="status-note" id="insight" aria-live="polite">In ogni istante: a(t) = −9,81 m/s².</div>
+  </section>
+  <section class="panel workings" aria-label="Svolgimento con tutte le unità di misura">
+    <div class="panel-heading"><strong>Calcoli passo per passo</strong><span class="helper">Sostituzioni numeriche · unità in ogni passaggio</span></div>
+    <p class="workings-intro">Ogni operazione mostra da dove provengono le unità: <strong>m/s · s = m</strong>, <strong>m/s² · s² = m</strong> e <strong>(m/s)² ÷ (m/s²) = m</strong>. I calcoli usano i valori esatti dei parametri; i numeri visualizzati sono arrotondati.</p>
+    <div class="working-grid">
+      <div class="working-card"><div class="working-title">1 · Quota all’istante selezionato</div><div id="calculationY"></div></div>
+      <div class="working-card"><div class="working-title">2 · Velocità all’istante selezionato</div><div id="calculationV"></div></div>
+      <div class="working-card"><div class="working-title">3 · Tempo totale di volo</div><div id="calculationT"></div></div>
+      <div class="working-card"><div class="working-title">4 · Velocità all’impatto</div><div id="calculationVf"></div></div>
+      <div class="working-card"><div class="working-title">5 · Altezza massima e tempo di salita</div><div id="calculationH"></div></div>
+      <div class="working-card"><div class="working-title">6 · Spazio totale percorso</div><div id="calculationS"></div></div>
+    </div>
+  </section>
+  <footer class="footnote">GodSaveThePhysics · Simulatore offline · Motore fisico con accelerazione costante · Convenzione dei segni: verso l’alto positivo</footer>
+</main>
+<script>
+(() => {
+  'use strict';
+  const $ = id => document.getElementById(id);
+  const stage = $('stage'), posGraph = $('positionGraph'), velGraph = $('velocityGraph');
+  const hRange=$('hRange'), hNum=$('hNum'), vRange=$('vRange'), vNum=$('vNum'), gRange=$('gRange'), gNum=$('gNum'), timeRange=$('timeRange');
+  const modeButtons=[...document.querySelectorAll('[data-mode]')], gravityButtons=[...document.querySelectorAll('[data-g]')], speedButtons=[...document.querySelectorAll('[data-speed]')];
+  const fmt=(x, digits=2)=> (Math.abs(x)<Math.pow(10,-digits)/2?0:x).toLocaleString('it-IT',{minimumFractionDigits:digits,maximumFractionDigits:digits});
+  const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
+  const state={mode:'fall',h:35,v0:0,throwSpeed:16,g:9.81,time:0,playing:false,speed:1,lastFrame:null,raf:null};
+  let resizeQueued=false;
+  function totalTime(){
+    if(state.mode==='fall') return Math.sqrt(2*state.h/state.g);
+    return (state.v0+Math.sqrt(state.v0*state.v0+2*state.g*state.h))/state.g;
+  }
+  function apexTime(){return state.v0>0?state.v0/state.g:0}
+  function maxHeight(){return state.h + Math.max(0,state.v0)*Math.max(0,state.v0)/(2*state.g)}
+  function heightAt(t){return Math.max(0,state.h+state.v0*t-.5*state.g*t*t)}
+  function velocityAt(t){return state.v0-state.g*t}
+  function traveled(){const a=maxHeight();return state.v0>0?2*a-state.h:state.h}
+  function stop(){state.playing=false;state.lastFrame=null;if(state.raf!==null){cancelAnimationFrame(state.raf);state.raf=null}$('playBtn').textContent='▶ Avvia'}
+  function resetTime(){stop();state.time=0;render()}
+  function updateRangeFill(el){const min=Number(el.min),max=Number(el.max),value=Number(el.value);el.style.setProperty('--pct',`${clamp(100*(value-min)/(max-min),0,100)}%`)}
+  function setControls(){
+    hRange.value=hNum.value=state.h;
+    vRange.value=vNum.value=state.throwSpeed;
+    gRange.value=gNum.value=state.g;
+    [hRange,vRange,gRange].forEach(updateRangeFill);
+    $('velocityControl').hidden=state.mode==='fall';
+    document.querySelector('.parameter-grid').style.gridTemplateColumns='';
+    if(state.mode==='fall'){
+      // Two evenly sized controls on wide screens; responsive CSS remains authoritative.
+      document.querySelector('.parameter-grid').classList.add('freefall-grid');
+    }else document.querySelector('.parameter-grid').classList.remove('freefall-grid');
+    modeButtons.forEach(b=>{const active=b.dataset.mode===state.mode;b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active))});
+    gravityButtons.forEach(b=>b.classList.toggle('selected',Math.abs(Number(b.dataset.g)-state.g)<.001));
+    $('stageTitle').textContent=state.mode==='fall'?'🍎 Caduta libera della mela':'↑ Lancio verticale verso l’alto';
+    $('fourthStatTitle').textContent=state.mode==='fall'?'Spazio percorso totale':'Tempo di salita';
+    $('fourthStatSub').textContent=state.mode==='fall'?'Dalla posizione iniziale al suolo':'Istante in cui v = 0';
+  }
+  function applyParameter(kind,value){
+    if(!Number.isFinite(value))return;
+    if(kind==='h')state.h=clamp(value,0,100);
+    if(kind==='v'){state.throwSpeed=clamp(value,1,30);state.v0=state.mode==='throw'?state.throwSpeed:0}
+    if(kind==='g')state.g=clamp(value,.5,20);
+    resetTime();setControls();
+  }
+  function connectPair(range,num,kind){
+    range.addEventListener('input',()=>applyParameter(kind,Number(range.value)));
+    num.addEventListener('change',()=>{const val=num.value.trim()===''?NaN:Number(num.value);if(Number.isFinite(val))applyParameter(kind,val);else setControls()});
+    num.addEventListener('keydown',e=>{if(e.key==='Enter')num.blur()});
+  }
+  connectPair(hRange,hNum,'h');connectPair(vRange,vNum,'v');connectPair(gRange,gNum,'g');
+  gravityButtons.forEach(b=>b.addEventListener('click',()=>applyParameter('g',Number(b.dataset.g))));
+  modeButtons.forEach(b=>b.addEventListener('click',()=>{
+    if(b.dataset.mode===state.mode)return;
+    state.mode=b.dataset.mode;
+    state.h=state.mode==='fall'?35:0;
+    state.v0=state.mode==='throw'?state.throwSpeed:0;
+    setControls();resetTime();
+  }));
+  speedButtons.forEach(b=>b.addEventListener('click',()=>{state.speed=Number(b.dataset.speed);speedButtons.forEach(x=>x.classList.toggle('active',x===b))}));
+  $('playBtn').addEventListener('click',()=>{
+    if(state.playing){stop();return}
+    if(totalTime()<=1e-9){return}
+    if(state.time>=totalTime()-1e-8)state.time=0;
+    state.playing=true;state.lastFrame=null;$('playBtn').textContent='Ⅱ Pausa';
+    state.raf=requestAnimationFrame(frame);
+    render();
+  });
+  $('resetBtn').addEventListener('click',resetTime);
+  $('stepBtn').addEventListener('click',()=>{stop();state.time=clamp(state.time+.1,0,totalTime());render()});
+  timeRange.addEventListener('input',()=>{stop();const T=totalTime();const chosen=clamp(Number(timeRange.value),0,T);state.time=(T-chosen<.0011)?T:chosen;render()});
+  document.addEventListener('visibilitychange',()=>{if(document.hidden&&state.playing)stop()});
+  function frame(ms){
+    state.raf=null;
+    if(!state.playing)return;
+    if(state.lastFrame!==null){const dt=clamp((ms-state.lastFrame)/1000,0,.08);state.time=Math.min(totalTime(),state.time+dt*state.speed)}
+    state.lastFrame=ms;
+    if(state.time>=totalTime()-1e-9)stop();
+    render();
+    if(state.playing)state.raf=requestAnimationFrame(frame);
+  }
+  function render(){
+    const T=totalTime(), t=clamp(state.time,0,T);state.time=t;
+    const y=heightAt(t),v=velocityAt(t), H=maxHeight(),vf=velocityAt(T),apex=apexTime();
+    $('liveTime').textContent=fmt(t)+' s';$('liveHeight').textContent=fmt(y)+' m';$('liveVelocity').textContent=fmt(v)+' m/s';
+    $('flightTime').textContent=fmt(T)+' s';$('finalVelocity').textContent=fmt(vf)+' m/s';$('maximumHeight').textContent=fmt(H)+' m';
+    $('fourthStat').textContent=state.mode==='fall'?fmt(traveled())+' m':fmt(apex)+' s';
+    document.querySelector('#finalVelocity + .stat-sub').textContent=T<1e-9?'Corpo già al suolo': 'Negativa: diretta verso il basso';
+    timeRange.max=Math.max(T,.0001);timeRange.value=t;updateRangeFill(timeRange);$('timeValue').textContent=fmt(t)+' / '+fmt(T)+' s';
+    let phase;
+    if(T<1e-9)phase='Al suolo';
+    else if(t>=T-1e-8)phase='Impatto con il suolo';
+    else if(t===0)phase=state.mode==='fall'?'Pronta a cadere':'Pronto al lancio';
+    else if(state.mode==='throw'&&Math.abs(t-apex)<.06)phase='Altezza massima: v = 0';
+    else if(state.mode==='throw'&&t<apex)phase='Fase di salita';
+    else phase='Fase di discesa';
+    $('phaseLabel').textContent=phase;
+    const a=fmt(state.g), half=fmt(state.g/2,3), h0=fmt(state.h),v0=fmt(state.v0);
+    $('equationY').textContent=`(${h0} m) + (${v0} m/s) · t − (${half} m/s²) · t²`;
+    $('equationV').textContent=`(${v0} m/s) − (${a} m/s²) · t`;
+    $('explanation').textContent=state.mode==='fall'
+      ?'La mela parte da ferma e cade perché la sua accelerazione è costante e diretta verso il basso. La velocità diminuisce algebricamente (diventa sempre più negativa).'
+      :'Durante la salita il corpo rallenta, al punto più alto la velocità è istantaneamente zero, poi ricade aumentando il modulo della velocità. L’accelerazione resta sempre −g, anche all’apice.';
+    $('insight').textContent=`In ogni istante: a(t) = −${a} m/s². ${state.mode==='throw'&&t>0&&Math.abs(t-apex)<.06?'All’apice v = 0, ma a ≠ 0.':''}`;
+    renderCalculations(t,T,y,v,H,vf,apex);
+    drawStage(y,v,H,apex);
+    drawGraph(posGraph,tt=>state.h+state.v0*tt-.5*state.g*tt*tt,'height',T,t);
+    drawGraph(velGraph,tt=>state.v0-state.g*tt,'velocity',T,t);
+  }
+  // Svolgimenti dimensionalmente consistenti, ricalcolati in sincronia con la simulazione.
+  function renderCalculations(t,T,y,v,H,vf,apex){
+    const f=n=>fmt(n,2), f3=n=>fmt(n,3), f4=n=>fmt(n,4);
+    const h=state.h, u=state.v0, g=state.g;
+    const vy=u*t, acc=.5*g*t*t, dv=g*t;
+    const step=(content,cls='')=>`<div class="calc-step ${cls}">${content}</div>`;
+    const note=content=>`<p class="calc-note">${content}</p>`;
+    const set=(id,html)=>{const el=$(id);if(el.innerHTML!==html)el.innerHTML=html};
+    set('calculationY',[
+      step('y(t) = y₀ + v₀t − ½gt²','formula'),
+      step(`y(${f(t)} s) = ${f(h)} m + (${f(u)} m/s) · (${f(t)} s) − ½ · (${f(g)} m/s²) · (${f(t)} s)²`),
+      step(`= ${f(h)} m + ${f3(vy)} m − ${f3(acc)} m`),
+      step(`y(${f(t)} s) ≈ ${f(y)} m`,'conclusion'),
+      note('I termini v₀t e ½gt² sono entrambi distanze espresse in metri.')
+    ].join(''));
+    set('calculationV',[
+      step('v(t) = v₀ − gt','formula'),
+      step(`v(${f(t)} s) = ${f(u)} m/s − (${f(g)} m/s²) · (${f(t)} s)`),
+      step(`= ${f(u)} m/s − ${f3(dv)} m/s`),
+      step(`v(${f(t)} s) ≈ ${f(v)} m/s`,'conclusion'),
+      note(`Accelerazione costante: a = −${f(g)} m/s². Se la velocità è negativa, il corpo sta scendendo.`)
+    ].join(''));
+    if(state.mode==='fall'){
+      const tSq=2*h/g;
+      set('calculationT',[
+        step('0 m = y₀ − ½gT²','formula'),
+        step('T² = 2y₀ / g'),
+        step(`T² = (2 · ${f(h)} m) / (${f(g)} m/s²)`),
+        step(`T² ≈ ${f4(tSq)} s²`),
+        step(`T = √(${f4(tSq)} s²) ≈ ${f(T)} s`,'conclusion'),
+        note(h===0?'La mela si trova già al suolo: il tempo di caduta è zero.':'Si prende la radice positiva, perché il tempo trascorso non è negativo.')
+      ].join(''));
+    }else{
+      const x=u*u, z=2*g*h, delta=x+z, root=Math.sqrt(delta);
+      set('calculationT',[
+        step('0 m = y₀ + v₀T − ½gT²','formula'),
+        step('T = [v₀ + √(v₀² + 2gy₀)] / g'),
+        step(`v₀² + 2gy₀ = (${f(u)} m/s)² + 2 · (${f(g)} m/s²) · (${f(h)} m)`),
+        step(`= ${f3(x)} m²/s² + ${f3(z)} m²/s² = ${f3(delta)} m²/s²`),
+        step(`√(v₀² + 2gy₀) ≈ ${f3(root)} m/s`),
+        step(`T = [${f(u)} m/s + ${f3(root)} m/s] / (${f(g)} m/s²) ≈ ${f(T)} s`,'conclusion'),
+        note('Si considera la soluzione positiva dell’equazione y(T) = 0 m. La radice con il segno meno dà un tempo negativo o nullo, non l’impatto successivo.')
+      ].join(''));
+    }
+    const gravTerm=g*T;
+    const checkDelta=u*u+2*g*h, checkRoot=Math.sqrt(checkDelta);
+    set('calculationVf',[
+      step('v<sub>f</sub> = v₀ − gT','formula'),
+      step(`v<sub>f</sub> = ${f(u)} m/s − (${f(g)} m/s²) · (${f3(T)} s)`),
+      step(`= ${f(u)} m/s − ${f3(gravTerm)} m/s ≈ ${f(vf)} m/s`,'conclusion'),
+      step('Controllo con Torricelli: v<sub>f</sub>² = v₀² + 2gy₀'),
+      step(`v<sub>f</sub>² = ${f3(u*u)} m²/s² + ${f3(2*g*h)} m²/s² = ${f3(checkDelta)} m²/s²`),
+      step(`v<sub>f</sub> = −√(${f3(checkDelta)} m²/s²) ≈ ${f(-checkRoot)} m/s`),
+      note(T<1e-9?'Il corpo è già a terra, quindi la velocità è zero.':'Si sceglie la radice negativa perché all’impatto il moto è diretto verso il basso.')
+    ].join(''));
+    if(state.mode==='fall'){
+      set('calculationH',[
+        step('v₀ = 0 m/s','formula'),
+        step('y<sub>max</sub> = y₀'),
+        step(`y<sub>max</sub> = ${f(h)} m`,'conclusion'),
+        step('t<sub>salita</sub> = 0,00 s'),
+        note('Una mela lasciata da ferma non sale; la quota maggiore è quella iniziale.')
+      ].join(''));
+      set('calculationS',[
+        step('s = y₀ − y<sub>finale</sub>','formula'),
+        step(`s = ${f(h)} m − 0,00 m`),
+        step(`s = ${f(h)} m`,'conclusion'),
+        note('In caduta libera senza inversione di moto, lo spazio percorso coincide con il modulo dello spostamento.')
+      ].join(''));
+    }else{
+      const rise=u*u/(2*g);
+      set('calculationH',[
+        step('t<sub>salita</sub> = v₀ / g','formula'),
+        step(`= (${f(u)} m/s) / (${f(g)} m/s²) ≈ ${f(apex)} s`),
+        step('Δh<sub>salita</sub> = v₀² / (2g)'),
+        step(`= (${f(u)} m/s)² / [2 · (${f(g)} m/s²)]`),
+        step(`= (${f3(u*u)} m²/s²) / (${f3(2*g)} m/s²) ≈ ${f3(rise)} m`),
+        step(`y<sub>max</sub> = ${f(h)} m + ${f3(rise)} m ≈ ${f(H)} m`,'conclusion'),
+        note('Al culmine v = 0 m/s, ma a = −g: la gravità continua ad agire.')
+      ].join(''));
+      set('calculationS',[
+        step('s = s<sub>salita</sub> + s<sub>discesa</sub>','formula'),
+        step(`s<sub>salita</sub> = y<sub>max</sub> − y₀ = ${f3(H)} m − ${f(h)} m ≈ ${f3(rise)} m`),
+        step(`s<sub>discesa</sub> = ${f3(H)} m − 0,00 m = ${f3(H)} m`),
+        step(`s ≈ ${f3(rise)} m + ${f3(H)} m = ${f(traveled())} m`,'conclusion'),
+        note(`Spazio totale ≠ modulo dello spostamento (che è ${f(h)} m): il corpo prima sale e poi scende.`)
+      ].join(''));
+    }
+  }
+  function canvasSetup(canvas){
+    const rect=canvas.getBoundingClientRect();
+    const w=Math.max(1,rect.width),h=Math.max(1,rect.height),dpr=Math.min(window.devicePixelRatio||1,2);
+    const W=Math.round(w*dpr),H=Math.round(h*dpr);
+    if(canvas.width!==W||canvas.height!==H){canvas.width=W;canvas.height=H}
+    const c=canvas.getContext('2d');c.setTransform(dpr,0,0,dpr,0,0);c.clearRect(0,0,w,h);return{c,w,h};
+  }
+  function rounded(c,x,y,w,h,r,fill,stroke){if(w<=0||h<=0)return;c.beginPath();c.roundRect(x,y,w,h,Math.min(r,w/2,h/2));if(fill){c.fillStyle=fill;c.fill()}if(stroke){c.strokeStyle=stroke;c.stroke()}}
+  function pill(c,text,x,y,bg,fg,font='12px system-ui'){
+    c.save();c.font='700 '+font;const width=c.measureText(text).width+20;
+    rounded(c,x,y,width,25,12,bg);c.fillStyle=fg;c.textBaseline='middle';c.fillText(text,x+10,y+12.5);c.restore();return width;
+  }
+  function drawApple(c,x,y,r){
+    c.save();c.translate(x,y);
+    c.fillStyle='rgba(51,68,72,.15)';c.beginPath();c.ellipse(2,16,r*.72,4,0,0,Math.PI*2);c.fill();
+    c.fillStyle='#d94f50';c.beginPath();c.moveTo(0,-r*.72);c.bezierCurveTo(-r*.9,-r*1.25,-r*1.32,-r*.45,-r*.96,r*.46);c.bezierCurveTo(-r*.55,r*1.25,-r*.16,r*.88,0,r*.9);c.bezierCurveTo(r*.26,r*1.2,r*.7,r*.91,r*.99,r*.39);c.bezierCurveTo(r*1.3,-r*.52,r*.7,-r*1.24,0,-r*.72);c.fill();
+    c.strokeStyle='#7d5433';c.lineWidth=2.5;c.lineCap='round';c.beginPath();c.moveTo(0,-r*.72);c.lineTo(r*.08,-r*1.15);c.stroke();
+    c.fillStyle='#389c67';c.beginPath();c.ellipse(r*.42,-r*1.06,r*.5,r*.21,-.4,0,Math.PI*2);c.fill();
+    c.fillStyle='rgba(255,255,255,.36)';c.beginPath();c.ellipse(-r*.42,-r*.12,r*.16,r*.34,-.35,0,Math.PI*2);c.fill();c.restore();
+  }
+  function drawBall(c,x,y,r){c.save();c.translate(x,y);const grad=c.createRadialGradient(-r*.45,-r*.43,1,0,0,r*1.25);grad.addColorStop(0,'#ffd098');grad.addColorStop(.45,'#f49548');grad.addColorStop(1,'#c86832');c.fillStyle=grad;c.beginPath();c.arc(0,0,r,0,Math.PI*2);c.fill();c.strokeStyle='rgba(141,72,43,.35)';c.lineWidth=1.5;c.beginPath();c.arc(0,0,r,0,Math.PI*2);c.stroke();c.restore()}
+  function arrow(c,x,y,len,color){if(Math.abs(len)<4)return;c.save();c.strokeStyle=color;c.fillStyle=color;c.lineWidth=3;c.lineCap='round';c.beginPath();c.moveTo(x,y);c.lineTo(x,y+len);c.stroke();const s=len>0?1:-1;c.beginPath();c.moveTo(x,y+len);c.lineTo(x-6,y+len-s*9);c.lineTo(x+6,y+len-s*9);c.closePath();c.fill();c.restore()}
+  function drawStage(y,v,H,apex){
+    const {c,w,h}=canvasSetup(stage);const ground=h-37,plotTop=36,ballRad=13,base=ground-ballRad-2;
+    const usable=base-plotTop-18;const top=Math.max(6,H*1.12+1);const py=q=>base-clamp(q,0,top)/top*usable;
+    const grad=c.createLinearGradient(0,0,0,h);grad.addColorStop(0,'#eaf5ff');grad.addColorStop(1,'#f5fbff');c.fillStyle=grad;c.fillRect(0,0,w,h);
+    // Soft background hills.
+    c.fillStyle='rgba(107,175,181,.105)';c.beginPath();c.moveTo(0,ground);c.quadraticCurveTo(w*.27,ground-65,w*.55,ground-14);c.quadraticCurveTo(w*.79,ground-66,w,ground-27);c.lineTo(w,ground);c.fill();
+    c.fillStyle='rgba(129,183,172,.10)';c.beginPath();c.moveTo(0,ground);c.quadraticCurveTo(w*.35,ground-28,w*.67,ground-8);c.quadraticCurveTo(w*.9,ground-38,w,ground-18);c.lineTo(w,ground);c.fill();
+    // Height scale ticks on the left, with understated guide lines.
+    const tickCount=5;
+    c.textAlign='left';c.font='11px system-ui';c.textBaseline='middle';
+    for(let i=0;i<=tickCount;i++){
+      const q=top*i/tickCount, yy=py(q);
+      c.setLineDash([3,6]);c.strokeStyle='#dceaf6';c.lineWidth=1;c.beginPath();c.moveTo(43,yy);c.lineTo(w-14,yy);c.stroke();c.setLineDash([]);
+      c.fillStyle='#7d94ad';c.fillText(fmt(q,top<12?1:0)+' m',8,yy);
+    }
+    // Ground line and grassy strip.
+    c.fillStyle='#e4f2e8';c.fillRect(0,ground,w,h-ground);
+    c.strokeStyle='#68b29b';c.lineWidth=2;c.beginPath();c.moveTo(0,ground);c.lineTo(w,ground);c.stroke();
+    c.fillStyle='#618874';c.font='700 11px system-ui';c.fillText('SUOLO · y = 0',Math.max(7,w-121),ground+16);
+    const x=w<390?w*.60:w*.64;
+    // Reference levels and dotted vertical motion line.
+    c.strokeStyle='#78abd4';c.lineWidth=1.3;c.setLineDash([4,6]);c.beginPath();c.moveTo(x,plotTop-10);c.lineTo(x,base+14);c.stroke();c.setLineDash([]);
+    const startY=py(state.h),peakY=py(H);
+    if(H>state.h+.1){c.strokeStyle='rgba(31,150,132,.7)';c.setLineDash([5,4]);c.beginPath();c.moveTo(52,peakY);c.lineTo(w-16,peakY);c.stroke();c.setLineDash([])}
+    if(state.h>.1){c.strokeStyle='rgba(76,111,166,.55)';c.setLineDash([6,5]);c.beginPath();c.moveTo(48,startY);c.lineTo(w-18,startY);c.stroke();c.setLineDash([])}
+    // Vertical displacement bracket with a labeled segment.
+    const cur=py(y),small=w<405;
+    c.strokeStyle='#2d70cf';c.lineWidth=2;c.beginPath();c.moveTo(x+32,base);c.lineTo(x+32,cur);c.moveTo(x+27,base);c.lineTo(x+37,base);c.moveTo(x+27,cur);c.lineTo(x+37,cur);c.stroke();
+    if(Math.abs(base-cur)>45){
+      c.fillStyle='#2466bb';c.font='700 12px system-ui';c.fillText('y',x+41,(cur+base)/2);
+    }
+    // Distinct object drawing, then directional velocity vector beside it.
+    if(state.mode==='fall')drawApple(c,x,cur,ballRad+2);else drawBall(c,x,cur,ballRad);
+    const T=totalTime(),t=state.time;
+    if(Math.abs(v)>.15&&t<T-1e-7){
+      const arrowLen=clamp(Math.abs(v)*2,12,63)*(v>0?-1:1);
+      arrow(c,x-31,cur,arrowLen,v>0?'#169d89':'#cd595e');
+    }
+    // Labels kept inside scene boundaries.
+    const currentLabel=`y = ${fmt(y)} m`;
+    const labelX=clamp(x+20,54,Math.max(54,w-117));
+    const labelY=clamp(cur-38,5,ground-31);
+    pill(c,currentLabel,labelX,labelY,'#fff','#2b5482',small?'11px system-ui':'12px system-ui');
+    if(state.mode==='throw'&&H>state.h+.1){
+      c.fillStyle='#128476';c.font='700 11px system-ui';c.textBaseline='bottom';
+      c.fillText(`Culmine: ${fmt(H)} m`,52,clamp(peakY-6,13,ground-16));
+    }
+    // Mini direction key.
+    rounded(c,9,9,small?111:127,27,12,'rgba(255,255,255,.86)','#dae8f4');
+    c.fillStyle='#51718f';c.font='700 11px system-ui';c.textBaseline='middle';c.fillText('↑ +y   ↓ −g',19,22);
+  }
+  function niceScale(v){if(Math.abs(v)<1e-12)return 0;const a=Math.abs(v),exp=Math.pow(10,Math.floor(Math.log10(a))),norm=a/exp;const n=norm<=1?1:norm<=2?2:norm<=2.5?2.5:norm<=5?5:10;return Math.sign(v)*n*exp}
+  function drawGraph(canvas, fn, kind, T, t){
+    const {c,w,h}=canvasSetup(canvas);const small=w<350;
+    const mar={l:small?47:56,r:16,t:18,b:32};const x0=mar.l,x1=w-mar.r,y0=mar.t,y1=h-mar.b;
+    const xRange=Math.max(T,.3),vStart=fn(0),vEnd=fn(T),rawHi=kind==='height'?maxHeight():Math.max(vStart,vEnd,0),rawLo=kind==='height'?0:Math.min(vStart,vEnd,0);
+    let hi,lo;
+    if(kind==='height'){hi=Math.max(1,rawHi*1.12);lo=0}
+    else{const pad=Math.max(1,Math.max(Math.abs(rawHi),Math.abs(rawLo))*.12);hi=Math.max(.5,rawHi+pad);lo=Math.min(-.5,rawLo-pad)}
+    const xp=tt=>x0+tt/xRange*(x1-x0),yp=val=>y1-(val-lo)/(hi-lo)*(y1-y0);
+    // Axes grid and values.
+    c.font=small?'10px system-ui':'11px system-ui';c.textBaseline='middle';c.fillStyle='#8191a5';c.lineWidth=1;
+    for(let i=0;i<=4;i++){
+      const val=lo+(hi-lo)*i/4,py=y1-(y1-y0)*i/4;
+      c.strokeStyle='#edf1f8';c.beginPath();c.moveTo(x0,py);c.lineTo(x1,py);c.stroke();
+      c.textAlign='right';c.fillStyle='#8997a8';c.fillText(fmt(val,Math.abs(val)>=100?0:1),x0-8,py);
+    }
+    for(let i=0;i<=4;i++){
+      const xx=x0+(x1-x0)*i/4,tt=xRange*i/4;
+      c.strokeStyle='#f0f3f8';c.beginPath();c.moveTo(xx,y0);c.lineTo(xx,y1);c.stroke();
+      c.textAlign='center';c.fillStyle='#8597ae';c.textBaseline='alphabetic';c.fillText(fmt(tt,1),xx,y1+16);
+    }
+    c.strokeStyle='#b9c9da';c.lineWidth=1.3;c.beginPath();c.moveTo(x0,y0);c.lineTo(x0,y1);c.lineTo(x1,y1);c.stroke();
+    if(kind==='velocity'&&lo<0&&hi>0){c.strokeStyle='#aebdd0';c.setLineDash([4,3]);c.beginPath();c.moveTo(x0,yp(0));c.lineTo(x1,yp(0));c.stroke();c.setLineDash([])}
+    const color=kind==='height'?'#178e80':'#d35d60';
+    // Shaded area to make the locus legible.
+    if(T>0){
+      c.beginPath();c.moveTo(xp(0),yp(fn(0)));
+      const n=130;
+      for(let i=1;i<=n;i++){const tt=T*i/n;c.lineTo(xp(tt),yp(fn(tt)))}
+      c.lineTo(xp(T),y1);c.lineTo(xp(0),y1);c.closePath();
+      c.fillStyle=kind==='height'?'rgba(29,149,129,.075)':'rgba(212,95,91,.06)';c.fill();
+    }
+    c.beginPath();c.moveTo(xp(0),yp(fn(0)));
+    for(let i=1;i<=130;i++){const tt=T*i/130;c.lineTo(xp(tt),yp(fn(tt)))}
+    c.strokeStyle=color;c.lineWidth=3;c.lineCap='round';c.lineJoin='round';c.stroke();
+    const xx=xp(t),yy=yp(fn(t));
+    c.strokeStyle='rgba(71,108,150,.55)';c.setLineDash([4,4]);c.lineWidth=1.3;c.beginPath();c.moveTo(xx,y0);c.lineTo(xx,y1);c.stroke();c.setLineDash([]);
+    c.fillStyle='#fff';c.beginPath();c.arc(xx,yy,6,0,Math.PI*2);c.fill();c.strokeStyle=color;c.lineWidth=3;c.stroke();
+    // Value annotation clamped to chart bounds, well above/below the marker.
+    const text=fmt(fn(t),2)+(kind==='height'?' m':' m/s');
+    c.font='700 11px system-ui';const textW=c.measureText(text).width;
+    const lx=clamp(xx+11,x0+4,x1-textW-14),ly=clamp(yy-35,y0+2,y1-27);
+    rounded(c,lx,ly,textW+15,23,8,'#fff','#dfe7f2');
+    c.textBaseline='middle';c.textAlign='left';c.fillStyle=color;c.fillText(text,lx+7,ly+11.5);
+    c.textAlign='right';c.fillStyle='#7890a9';c.font='11px system-ui';c.fillText('t (s)',x1,y1+28);
+  }
+  function onResize(){if(resizeQueued)return;resizeQueued=true;requestAnimationFrame(()=>{resizeQueued=false;render()})}
+  if('ResizeObserver'in window){const obs=new ResizeObserver(onResize);[stage,posGraph,velGraph].forEach(c=>obs.observe(c))}else window.addEventListener('resize',onResize);
+  setControls();render();
+  // Lightweight inspection hooks for interactive teaching demos and automated sanity checks.
+  window.simulatorInfo=()=>({mode:state.mode,height:state.h,initialVelocity:state.v0,gravity:state.g,time:state.time,totalTime:totalTime(),finalVelocity:velocityAt(totalTime()),maximumHeight:maxHeight()});
+})();
+</script>
+<style>
+@media(min-width:721px){.parameter-grid.freefall-grid{grid-template-columns:1fr 1fr}.parameter-grid.freefall-grid .g-control{grid-column:auto}}
+</style>
+</body>
+</html>
